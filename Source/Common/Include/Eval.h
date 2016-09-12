@@ -340,6 +340,9 @@ public:
     // (e.g. when vectors are manages by .net)
     // 
     virtual void ForwardPass(const ValueRefs<ElemType>& inputs, ValueRefs<ElemType>& output) = 0;
+
+    virtual void SetSeqBeginTime(int beginTime) = 0;
+    virtual void SetSeqBeginTimeMin(int beginTimeMin) = 0;
 };
 
 template <typename ElemType>

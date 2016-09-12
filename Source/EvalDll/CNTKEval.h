@@ -90,7 +90,10 @@ template <typename ElemType>
 class CNTKEvalExtended : public CNTKEvalBase<ElemType>, public IEvaluateModelExtended<ElemType>
 {
 public:
-    CNTKEvalExtended() : CNTKEvalBase<ElemType>(), m_started(false) {}
+    CNTKEvalExtended() : CNTKEvalBase<ElemType>(), 
+        m_started(false),
+        m_SeqBeginTime(0),
+        m_SeqBeginTimeMin(0){}
 
     virtual VariableSchema GetOutputSchema() const override;
 
@@ -113,6 +116,10 @@ public:
     {
         CNTKEvalBase<ElemType>::Init(config);
     }
+
+    virtual void SetSeqBeginTime(int beginTime) override;
+    virtual void SetSeqBeginTimeMin(int beginTimeMin) override;
+
 private:
     static VariableLayout ToVariableLayout(const ComputationNodeBasePtr n);
     std::vector<ComputationNodeBasePtr> m_outputNodes;
@@ -124,5 +131,8 @@ private:
     template<template<typename> class ValueContainer> 
     void ForwardPassT(const std::vector < ValueBuffer<ElemType, ValueContainer> >& inputs,
                       std::vector < ValueBuffer<ElemType, ValueContainer> >& outputs);
+
+    int m_SeqBeginTime;
+    int m_SeqBeginTimeMin;
 };
 } } }

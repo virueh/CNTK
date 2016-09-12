@@ -359,7 +359,10 @@ void CNTKEvalExtended<ElemType>::ForwardPassT(const std::vector<ValueBuffer<Elem
         int numCols = type == MatrixType::DENSE ? buffer.m_buffer.size() / numRows : buffer.m_colIndices.size() - 1;
         assert(numCols >= 1);
         inputNode->GetMBLayout()->Init(1, numCols);
-        inputNode->GetMBLayout()->AddSequence(0, 0, 0, numCols);
+        inputNode->GetMBLayout()->AddSequence(0, 0, m_SeqBeginTime, numCols);
+
+        if (m_SeqBeginTimeMin < m_SeqBeginTime)
+            m_SeqBeginTime--;
 
         if (type == MatrixType::DENSE)
             matrix->SetValue(numRows, numCols, matrix->GetDeviceId(), buffer.m_buffer.data(), matrixFlagNormal);
@@ -406,6 +409,18 @@ void CNTKEvalExtended<ElemType>::ForwardPassT(const std::vector<ValueBuffer<Elem
         ElemType* data = const_cast<ElemType*>(vec.data());
         outputMatrix->CopyToArray(data, numElements);
     }
+}
+
+template<typename ElemType>
+void CNTKEvalExtended<ElemType>::SetSeqBeginTime(int beginTime)
+{
+    m_SeqBeginTime = beginTime;
+}
+
+template<typename ElemType>
+void CNTKEvalExtended<ElemType>::SetSeqBeginTimeMin(int beginTimeMin)
+{
+    m_SeqBeginTimeMin = beginTimeMin;
 }
 
 template<typename ElemType>
