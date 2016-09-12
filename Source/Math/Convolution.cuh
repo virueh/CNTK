@@ -235,8 +235,8 @@ __device__ double Round(double a)
 template <typename ElemType>
 __global__ void kROIPoolingForward(const int totalIterations,
     const int numROIs, const int numImg,
-    const int channels, const int height, const int width,
-    const int pooledHeight, const int pooledWidth, const ElemType* src, 
+    const int channels, const int width, const int height,
+    const int pooledWidth, const int pooledHeight, const ElemType* src,
     const ElemType* roiData, ElemType* dst, ElemType* argmax)
 {
     // index loops over all totalRois*c*pooledHeight*pooledWidth output locations.
@@ -306,8 +306,8 @@ __global__ void kROIPoolingForward(const int totalIterations,
 template <typename ElemType>
 __global__ void kROIPoolingBackward(const int totalIterations,
     const int numROIs, const int numImg,
-    const int channels, const int height, const int width,
-    const int pooledHeight, const int pooledWidth, const ElemType* pooledGrad,
+    const int channels, const int width, const int height,
+    const int pooledWidth, const int pooledHeight, const ElemType* pooledGrad,
     const ElemType* roiData, ElemType* grad, const ElemType* argmax)
 {
     // index loops over all input locations (locations in the original input tensor).
@@ -348,7 +348,7 @@ __global__ void kROIPoolingBackward(const int totalIterations,
             float winW = (float)roiWidth  / (float)pooledWidth;
 
             // what pooled nodes in the output for this ROI could have pooled this input location?
-			// we use int here since the computation can yield a negative result
+            // we use int here since the computation can yield a negative result
             int phstart = (int)((float)(h - roiStartH) / winH);
             int pwstart = (int)((float)(w - roiStartW) / winW);
             int phend   = (int)(ceilf((float)(h - roiStartH + 1) / winH));

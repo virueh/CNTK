@@ -197,7 +197,7 @@ protected:
     bool m_transpose; // means de-convolution ...I think
     ImageLayoutKind m_imageLayout;
     
-	size_t m_maxTempMemSizeInSamples;
+    size_t m_maxTempMemSizeInSamples;
     shared_ptr<Matrix<ElemType>> m_tempMatrix;
 
     std::unique_ptr<ConvolutionEngine<ElemType>> m_convEng;
@@ -531,13 +531,13 @@ public:
         : Base(deviceId, name), m_argmaxData(Matrix<ElemType>::Zeros(1,1,deviceId))
     {
     }
-    ROIPoolingNode(DEVICEID_TYPE deviceId, const wstring& name, const size_t height, const size_t width, ImageLayoutKind imageLayoutKind)
-        : Base(deviceId, name), m_outH(height), m_outW(width), m_imageLayout(imageLayoutKind), m_argmaxData(Matrix<ElemType>::Zeros(1, 1, deviceId))
+    ROIPoolingNode(DEVICEID_TYPE deviceId, const wstring& name, const size_t width, const size_t height, ImageLayoutKind imageLayoutKind)
+        : Base(deviceId, name), m_outW(width), m_outH(height), m_imageLayout(imageLayoutKind), m_argmaxData(Matrix<ElemType>::Zeros(1, 1, deviceId))
     {
     }
 
     ROIPoolingNode(const ScriptableObjects::IConfigRecordPtr configp)
-        : ROIPoolingNode(configp->Get(L"deviceId"), L"<placeholder>", configp->Get(L"H"), configp->Get(L"W"),
+        : ROIPoolingNode(configp->Get(L"deviceId"), L"<placeholder>", configp->Get(L"W"), configp->Get(L"H"),
         ImageLayoutKindFrom(configp->Get(L"imageLayout")))
     {
         AttachInputsFromConfig(configp, GetExpectedNumInputs());
@@ -591,7 +591,7 @@ public:
 
         m_tempMatrix->Resize(m_outH * m_outW * numChannels * roisPerImage, inputSlice.GetNumCols());
         inputSlice.ROIPoolingForward(roisPerImage, inputSlice.GetNumCols(), 
-            numChannels, inputH, inputW, m_outH, m_outW, ROIs, outputSlice, *m_tempMatrix);
+            numChannels, inputW, inputH, m_outW, m_outH, ROIs, outputSlice, *m_tempMatrix);
     }
 
     void Save(File& fstream) const override
@@ -648,7 +648,7 @@ public:
         auto roiData = Input(1)->ValueFor(fr);
 
         pooledGrad.ROIPoolingBackward(roisPerImage, inputSlice.GetNumCols(), numChannels, 
-            inputH, inputW, m_outH, m_outW, roiData, inputGrad, *m_tempMatrix);
+            inputW, inputH, m_outW, m_outH, roiData, inputGrad, *m_tempMatrix);
     }
 
     void CopyTo(ComputationNodeBasePtr nodeP, const std::wstring& newName, const CopyNodeFlags flags) const override
