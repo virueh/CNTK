@@ -248,8 +248,8 @@ __global__ void kROIPoolingForward(const int totalIterations,
         // n is the global ROI index (the new batch index)
         int pw = index % pooledWidth;
         int ph = (index / pooledWidth) % pooledHeight;
-        int c = (index / pooledWidth / pooledHeight) % channels;
-        int n = index / pooledWidth / pooledHeight / channels;
+        int c  = (index / pooledWidth / pooledHeight) % channels;
+        int n  =  index / pooledWidth / pooledHeight / channels;
 
         // each ROI is 4 elements: (x, y, w, h)
         roiData += n * 4;
@@ -261,7 +261,7 @@ __global__ void kROIPoolingForward(const int totalIterations,
         int roiHeight = (int)(max(Round(roiData[3] * height), 1.0));
         
         float winH = (float)roiHeight / (float)pooledHeight;
-        float winW = (float)roiWidth / (float)pooledWidth;
+        float winW = (float)roiWidth  / (float)pooledWidth;
         
         // compute window for this output location.
         int hstart = (int)((float)ph * winH);
@@ -271,9 +271,9 @@ __global__ void kROIPoolingForward(const int totalIterations,
         
         // Add ROI offsets and clip to input boundaries
         hstart = min(max(hstart + roiStartH, 0), height);
-        hend   = min(max(hend + roiStartH, 0), height);
+        hend   = min(max(hend   + roiStartH, 0), height);
         wstart = min(max(wstart + roiStartW, 0), width);
-        wend   = min(max(wend + roiStartW, 0), width);
+        wend   = min(max(wend   + roiStartW, 0), width);
         
         bool isempty = (hend <= hstart) || (wend <= wstart);
         // Define an empty pooling region to be zero

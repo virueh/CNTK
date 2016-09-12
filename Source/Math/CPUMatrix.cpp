@@ -4383,7 +4383,8 @@ void CPUMatrix<ElemType>::ROIPoolingBackward(const size_t numRois, const size_t 
 {
     // loop over images in the batch.
 #pragma omp parallel for
-	for (int imgIdx = 0; imgIdx < numImg; imgIdx++) {
+	for (int imgIdx = 0; imgIdx < numImg; imgIdx++) 
+	{
         // ROIs for this image. length 4*numRois;
         auto rois = roiData.ColumnSlice(imgIdx, 1).Data();
         // gradient values for all ROIs from this image. length numRois*pooledHeight*pooledWidth*channels;
@@ -4392,11 +4393,14 @@ void CPUMatrix<ElemType>::ROIPoolingBackward(const size_t numRois, const size_t 
 
         // loop over spatial locations in the image.
 #pragma omp parallel for
-		for (int w = 0; w < width; w++) {
+		for (int w = 0; w < width; w++) 
+		{
 #pragma omp parallel for
-			for (int h = 0; h < width; h++) {
+			for (int h = 0; h < width; h++) 
+			{
                 // loop over the ROIs seeing which ones contain this location.
-				for (int roiN = 0; roiN < numRois; roiN++) {
+				for (int roiN = 0; roiN < numRois; roiN++) 
+				{
                     // each ROI is 4 elements: (x, y, w, h).
                     int roiOffset = roiN * 4;
 
@@ -4426,7 +4430,8 @@ void CPUMatrix<ElemType>::ROIPoolingBackward(const size_t numRois, const size_t 
 					pwstart = min(max(pwstart, (size_t)0), pooledWidth);
                     pwend   = min(max(pwend, (size_t)0), pooledWidth);
 
-					for (size_t c = 0; c < channels; c++) {
+					for (size_t c = 0; c < channels; c++) 
+					{
                         ElemType gradient = 0;
                         // [W x H x C x N]
 						size_t index = w + h*width + c*height*width;

@@ -196,8 +196,10 @@ protected:
     PoolKind m_poolKind;
     bool m_transpose; // means de-convolution ...I think
     ImageLayoutKind m_imageLayout;
-    size_t m_maxTempMemSizeInSamples;
+    
+	size_t m_maxTempMemSizeInSamples;
     shared_ptr<Matrix<ElemType>> m_tempMatrix;
+
     std::unique_ptr<ConvolutionEngine<ElemType>> m_convEng;
 };
 
@@ -505,10 +507,9 @@ protected:
 
 // ROI inputs should be [4 * ROIs per image x Batch Size]. Images are
 // [W*H*C x Batch Size]. The output shape of this node is [Pooled
-// Width x Pooled Height x Channels x ROIs Per Image x Batch Size],
-// which the CNTK Matrix represents as [Pooled Width * Pooled Height *
-// Channels * ROIs Per Image x Batch Size]. However, we want the fully
-// connected layers to interpret /each ROI/ as an image, so giving:
+// Width x Pooled Height x Channels x ROIs Per Image x Batch Size].
+// However, we want the fully connected layers to interpret 
+// /each ROI/ as an image, so giving:
 // [Pooled Width * Pooled Height * Channels x ROIs Per Image * Batch
 // Size].
 

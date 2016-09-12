@@ -268,7 +268,6 @@ void NDLNodeEvaluatorImpl<ElemType>::Evaluate(NDLNode<ElemType>* node, const wst
             nodePtr = builder.LegacyReshape(NULL, num_rows, ImageDimensions::AsTensorShape(img_width, img_height, img_channels, imageLayoutKind), name);
         }
     }
-
     else if (cnNodeType == OperationNameOf(ReconcileDynamicAxisNode))
     {
         nodeParamCount = 2;
@@ -508,13 +507,13 @@ void NDLNodeEvaluatorImpl<ElemType>::Evaluate(NDLNode<ElemType>* node, const wst
     }
     else if (cnNodeType == OperationNameOf(ROIPoolingNode))
     {
-
-        nodeParamCount = 2;
+		// setup the parameter position of children so we can hook them up later
+		// parameters are height and width
+		nodeParamCount = 2;
         nodeParamStart = 0;
 
         if (pass == ndlPassInitial)
         {
-
             int id = 2; // skip inputValueNode and inputROINode
 
             // evaluate only scalar parameters
