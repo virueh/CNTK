@@ -531,14 +531,13 @@ public:
         : Base(deviceId, name), m_argmaxData(Matrix<ElemType>::Zeros(1,1,deviceId))
     {
     }
-    ROIPoolingNode(DEVICEID_TYPE deviceId, const wstring& name, const size_t width, const size_t height, ImageLayoutKind imageLayoutKind)
-        : Base(deviceId, name), m_outW(width), m_outH(height), m_imageLayout(imageLayoutKind), m_argmaxData(Matrix<ElemType>::Zeros(1, 1, deviceId))
+    ROIPoolingNode(DEVICEID_TYPE deviceId, const wstring& name, const size_t width, const size_t height) //, ImageLayoutKind imageLayoutKind)
+        : Base(deviceId, name), m_outW(width), m_outH(height), m_argmaxData(Matrix<ElemType>::Zeros(1, 1, deviceId))
     {
     }
 
     ROIPoolingNode(const ScriptableObjects::IConfigRecordPtr configp)
-        : ROIPoolingNode(configp->Get(L"deviceId"), L"<placeholder>", configp->Get(L"W"), configp->Get(L"H"),
-        ImageLayoutKindFrom(configp->Get(L"imageLayout")))
+        : ROIPoolingNode(configp->Get(L"deviceId"), L"<placeholder>", configp->Get(L"W"), configp->Get(L"H"))
     {
         AttachInputsFromConfig(configp, GetExpectedNumInputs());
     }
@@ -594,32 +593,24 @@ public:
             numChannels, inputW, inputH, m_outW, m_outH, ROIs, outputSlice, *m_tempMatrix);
     }
 
-    void Save(File& fstream) const override
-    {
-        Base::Save(fstream);
-        uint32_t imageLayoutKind = (uint32_t)m_imageLayout;
-        fstream << imageLayoutKind << m_outW << m_outH;
-    }
+    //void Save(File& fstream) const override
+    //{
+    //    Base::Save(fstream);
+    //}
 
-    void Load(File& fstream, size_t modelVersion) override
-    {
-        Base::Load(fstream, modelVersion);
-        uint32_t imageLayoutKind;
-        fstream >> imageLayoutKind >> m_outW >> m_outH;
-        m_imageLayout = (ImageLayoutKind)imageLayoutKind;
-    }
+    //void Load(File& fstream, size_t modelVersion) override
+    //{
+    //    Base::Load(fstream, modelVersion);
+    //}
 
     void Validate(bool isFinalValidationPass) override
     {
         Base::Validate(isFinalValidationPass);
         InferMBLayoutFromInputsForStandardCase(isFinalValidationPass);
 
-        auto inDims = ImageDimensions(GetInputSampleLayout(0), m_imageLayout);
+        auto inDims = ImageDimensions(GetInputSampleLayout(0), ImageLayoutKind::CHW);
         size_t roisPerImage = GetInputSampleLayout(1)[0] / 4;
 
-        if (isFinalValidationPass && m_imageLayout != ImageLayoutKind::CHW)
-            InvalidArgument("ROIPoolingNode only supports CHW image layout.");
-        
         if (isFinalValidationPass && (inDims.m_width < m_outW || inDims.m_height < m_outH))
             InvalidArgument("ROIPoolingNode: inputWidth must >= windowWidth and inputHeight must >= windowHeight.");
         // hack for use with LegacyReshape...4D tensor.
@@ -659,13 +650,11 @@ public:
             auto node = dynamic_pointer_cast<ROIPoolingNode<ElemType>>(nodeP);
             node->m_outW = m_outW;
             node->m_outH = m_outH;
-            node->m_imageLayout = m_imageLayout;
         }
     }
 
 protected:
     size_t m_outH, m_outW;
-    ImageLayoutKind m_imageLayout; // how to interpret the tensor (which dimensions are X/Y and C)
     shared_ptr<Matrix<ElemType>> m_tempMatrix;
     Matrix<ElemType> m_argmaxData;
 };
