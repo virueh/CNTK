@@ -492,7 +492,7 @@ protected:
 
 
 // -----------------------------------------------------------------------
-// ROIPoolingNode (inputROIs, inputFeatures)--pooling for object detection.
+// ROIPoolingNode (inputFeatures, inputROIs)--pooling for object detection.
 
 // Each input image has a fixed number of regions of interest (ROIs),
 // specified as bounding boxes (x, y, w, h) that are relative to the
@@ -503,7 +503,7 @@ protected:
 // we can get a label for it. The ROIs have different spatial sizes,
 // so this node does Max Pooling, but with an adaptive pooling window,
 // so that each ROI output has the spatial size expected by the first
-// fully-connected layer. ROIs are Input(0). Images are Input(1).
+// fully-connected layer. Images are Input(0). ROIs are Input(1). 
 
 // ROI inputs should be [4 * ROIs per image x Batch Size]. Images are
 // [W*H*C x Batch Size]. The output shape of this node is [Pooled
@@ -573,11 +573,11 @@ public:
     void ForwardProp(const FrameRange& fr) override
     {
         // first dimension is roiSize (4) * rois/image, second is mb size
-        int roisPerImage = GetInputSampleLayout(0)[0] / 4;
+        int roisPerImage = GetInputSampleLayout(1)[0] / 4;
 
-        auto inputShape = GetInputSampleLayout(1);
-        Matrix<ElemType> inputSlice = Input(1)->ValueFor(fr);
-        Matrix<ElemType> ROIs = Input(0)->ValueFor(fr);
+        auto inputShape = GetInputSampleLayout(0);
+        Matrix<ElemType> inputSlice = Input(0)->ValueFor(fr);
+        Matrix<ElemType> ROIs = Input(1)->ValueFor(fr);
 
         // our output slice for this minibatch.
         Matrix<ElemType> outputSlice = ValueFor(fr);
@@ -614,8 +614,8 @@ public:
         Base::Validate(isFinalValidationPass);
         InferMBLayoutFromInputsForStandardCase(isFinalValidationPass);
 
-        auto inDims = ImageDimensions(GetInputSampleLayout(1), m_imageLayout);
-        size_t roisPerImage = GetInputSampleLayout(0)[0] / 4;
+        auto inDims = ImageDimensions(GetInputSampleLayout(0), m_imageLayout);
+        size_t roisPerImage = GetInputSampleLayout(1)[0] / 4;
 
         if (isFinalValidationPass && m_imageLayout != ImageLayoutKind::CHW)
             InvalidArgument("ROIPoolingNode only supports CHW image layout.");
@@ -634,18 +634,18 @@ public:
     // term.
     void BackpropTo(const size_t /*inputIndex*/, const FrameRange& fr) override
     {
-        auto inputShape = GetInputSampleLayout(1);
-        Matrix<ElemType> inputSlice = Input(1)->ValueFor(fr);
+        auto inputShape = GetInputSampleLayout(0);
+        Matrix<ElemType> inputSlice = Input(0)->ValueFor(fr);
 
         int inputW = inputShape[0];
         int inputH = inputShape[1];
         int numChannels = inputShape[2];
 
-        auto inputGrad = Input(1)->GradientFor(fr);
+        auto inputGrad = Input(0)->GradientFor(fr);
         auto pooledGrad = GradientFor(fr);
 
-        int roisPerImage = GetInputSampleLayout(0)[0] / 4;
-        auto roiData = Input(0)->ValueFor(fr);
+        int roisPerImage = GetInputSampleLayout(1)[0] / 4;
+        auto roiData = Input(1)->ValueFor(fr);
 
         pooledGrad.ROIPoolingBackward(roisPerImage, inputSlice.GetNumCols(), numChannels, 
             inputH, inputW, m_outH, m_outW, roiData, inputGrad, *m_tempMatrix);

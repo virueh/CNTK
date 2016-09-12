@@ -102,7 +102,7 @@ public:
     ComputationNodePtr AveragePooling(const ComputationNodePtr inputValues,
                                       const size_t windowWidth, const size_t windowHeight, const size_t horizontalSubsample, const size_t verticalSubsample, ImageLayoutKind imageLayoutKind,
                                       const std::wstring nodeName = L"");
-    ComputationNodePtr ROIPooling(const ComputationNodePtr inputROIs, const ComputationNodePtr inputValues, const size_t H, const size_t W, ImageLayoutKind imageLayoutKind, const std::wstring nodeName = L"");
+	ComputationNodePtr ROIPooling(const ComputationNodePtr inputValues, const ComputationNodePtr inputROIs, const size_t H, const size_t W, ImageLayoutKind imageLayoutKind, const std::wstring nodeName = L"");
     ComputationNodePtr ReconcileDynamicAxis(const ComputationNodePtr dataInput, const ComputationNodePtr layoutInput, const std::wstring nodeName = L"");
 
 #ifdef COMING_SOON
