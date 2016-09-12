@@ -531,7 +531,7 @@ public:
         : Base(deviceId, name), m_argmaxData(Matrix<ElemType>::Zeros(1,1,deviceId))
     {
     }
-    ROIPoolingNode(DEVICEID_TYPE deviceId, const wstring& name, const size_t width, const size_t height) //, ImageLayoutKind imageLayoutKind)
+    ROIPoolingNode(DEVICEID_TYPE deviceId, const wstring& name, const size_t width, const size_t height)
         : Base(deviceId, name), m_outW(width), m_outH(height), m_argmaxData(Matrix<ElemType>::Zeros(1, 1, deviceId))
     {
     }
@@ -592,16 +592,6 @@ public:
         inputSlice.ROIPoolingForward(roisPerImage, inputSlice.GetNumCols(), 
             numChannels, inputW, inputH, m_outW, m_outH, ROIs, outputSlice, *m_tempMatrix);
     }
-
-    //void Save(File& fstream) const override
-    //{
-    //    Base::Save(fstream);
-    //}
-
-    //void Load(File& fstream, size_t modelVersion) override
-    //{
-    //    Base::Load(fstream, modelVersion);
-    //}
 
     void Validate(bool isFinalValidationPass) override
     {
