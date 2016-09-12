@@ -364,13 +364,13 @@ void ScaleSideTransformer::Apply(size_t id, cv::Mat &mat)
 
     if (scale_w)
     {
-        targetW = (int)m_target;
-        targetH = (int)round(height * scale_ratio);
+		targetW = (int)m_target;
+		targetH = (int)round(height * scale_ratio);
     }
     else
     {
-        targetH = (int)m_target;
-        targetW = (int)round(width * scale_ratio);
+		targetH = (int)m_target;
+		targetW = (int)round(width * scale_ratio);
     }
 
     cv::resize(mat, mat, cv::Size(targetW, targetH), 0, 0, cv::INTER_LINEAR);
