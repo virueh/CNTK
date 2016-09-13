@@ -4279,9 +4279,11 @@ void CPUMatrix<ElemType>::MaxPoolingBackward(const CPUMatrix<ElemType>& out, con
 // and image should populate that location, computes the subset of the image
 // corresponding to the ROI and which pixels in that subset should go into the
 // output location, then takes the max value over that window.
-// roiData: 4*numROIs*numImg. src: width*height*channels*numImg; arranged [W x H x C x N].
-// dst: pooledWidth*pooledHeight*channels*numRois*numImg;
-// arranged as [W x H x C x R x N], where R = numROIs.
+// src: Images              [W x H x C x N]
+// roiData: ROIs            [4 x numROIs x N], 
+// dst: Pooled ROIs         [PW x PH x C x numROIs x N]
+// argmax: max positions    [PW x PH x C x numROIs x N]
+// where PW = Pooled Width, PH = Pooled Height, C = Channels, N = Batch Size
 template <class ElemType>
 void CPUMatrix<ElemType>::ROIPoolingForward(const size_t numRois, const size_t numImg, const size_t channels, const size_t width, const size_t height,
                                             const size_t pooledWidth, const size_t pooledHeight, const CPUMatrix<ElemType>& roiData, CPUMatrix<ElemType>& output, 

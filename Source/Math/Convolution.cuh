@@ -229,9 +229,11 @@ __device__ double Round(double a)
 // and image should populate that location, computes the subset of the image
 // corresponding to the ROI and which pixels in that subset should go into the
 // output location, then takes the max value over that window.
-// roiData: 4*numROIs*numImg. src: width*height*channels*numImg; arranged [W x H x C x N].
-// dst: pooledWidth*pooledHeight*channels*numRois*numImg;
-// arranged as [W x H x C x R x N], where R = numROIs.
+// src: Images              [W x H x C x N]
+// roiData: ROIs            [4 x numROIs x N], 
+// dst: Pooled ROIs         [PW x PH x C x numROIs x N]
+// argmax: max positions    [PW x PH x C x numROIs x N]
+// where PW = Pooled Width, PH = Pooled Height, C = Channels, N = Batch Size
 template <typename ElemType>
 __global__ void kROIPoolingForward(const int totalIterations,
     const int numROIs, const int numImg,
