@@ -273,8 +273,10 @@ public:
         static std::mutex nameIndiciesMutex;
         static std::map<std::wstring, size_t> nameIndices;
 
-        nameIndiciesMutex.lock();
+        std::unique_lock<std::mutex> lock(nameIndiciesMutex);
         size_t index = nameIndices[name]++;
+        lock.unlock();
+
         nameIndiciesMutex.unlock();
 
         if (index > 0)
