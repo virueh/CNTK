@@ -268,7 +268,8 @@ public:
     void SetAxisName(const std::wstring& name) { m_axisName = name; }
     void SetUniqueAxisName(std::wstring name) // helper for constructing
     {
-        // The mutex is need to make access to nameIndices be thread-safe. 
+        // Unfortunatelly, the following initialization of local static variables is not thread-safe in VS2013.
+        // The mutex is need to make access to nameIndices be thread-safe.
         static std::mutex nameIndiciesMutex;
         static std::map<std::wstring, size_t> nameIndices;
         size_t index;
