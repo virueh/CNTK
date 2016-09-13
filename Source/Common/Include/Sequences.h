@@ -272,12 +272,13 @@ public:
         // The mutex is need to make access to nameIndices be thread-safe. 
         static std::mutex nameIndiciesMutex;
         static std::map<std::wstring, size_t> nameIndices;
+        size_t index;
 
-        std::unique_lock<std::mutex> lock(nameIndiciesMutex);
-        size_t index = nameIndices[name]++;
-        lock.unlock();
-
-        nameIndiciesMutex.unlock();
+        // Use the block to make sure that nameIndiciesMutex is unlocked as soon as possible.
+        {
+            std::unique_lock<std::mutex> lock(nameIndiciesMutex);
+            index = nameIndices[name]++;
+        }
 
         if (index > 0)
             name += msra::strfun::wstrprintf(L"%d", (int)index);
